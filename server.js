@@ -5,6 +5,7 @@ const cors = require('cors')
 const dotEnv = require('dotenv')
 const resolvers = require('./resolvers/index')
 const typeDefs = require('./typeDefs/index')
+const { connection } = require('./database/util/index')
 
 // set environment variables
 dotEnv.config()
@@ -17,6 +18,9 @@ app.use(express.json())
 
 // server
 async function startApolloServer(typeDefs, resolvers) {
+    // db connection to mongo
+    connection()
+
     const apolloServer = new ApolloServer({
         typeDefs,
         resolvers,
