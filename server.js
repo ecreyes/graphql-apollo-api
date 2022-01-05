@@ -30,6 +30,7 @@ async function startApolloServer(typeDefs, resolvers) {
 
             return {
                 email: req.email,
+                loggedInUserId: req.loggedInUserId,
             }
         },
     })
