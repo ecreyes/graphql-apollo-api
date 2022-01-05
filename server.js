@@ -3,9 +3,7 @@ const app = express()
 const { ApolloServer, gql } = require('apollo-server-express')
 const cors = require('cors')
 const dotEnv = require('dotenv')
-const uuid = require('uuid')
-
-const { tasks, users } = require('./constants/index')
+const resolvers = require('./resolvers/index')
 
 // set environment variables
 dotEnv.config()
@@ -49,40 +47,6 @@ const typeDefs = gql`
         user: User!
     }
 `
-
-const resolvers = {
-    Query: {
-        tasks: () => tasks,
-        // (parent,args)
-        task: (_,{ id }) => tasks.find(task => task.id === id),
-        users: () => users,
-        user: (_, { id }) => users.find(user => user.id === id),
-    },
-    Mutation: {
-        createTask: (_,{ input }) => {
-            const { name, completed, userId } = input
-            const task = { id: uuid.v4() , name, completed, userId }
-
-            tasks.push(task)
-
-            return task
-        },
-    },
-    Task: {
-        user: parent => {
-            const { userId } = parent
-
-            return users.find(user => user.id === userId)
-        },
-    },
-    User: {
-        tasks: parent => {
-            const { id } = parent
-
-            return tasks.filter(task => task.userId === id)
-        },
-    },
-}
 
 // server
 async function startApolloServer(typeDefs, resolvers) {
