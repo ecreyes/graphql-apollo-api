@@ -6,6 +6,7 @@ const dotEnv = require('dotenv')
 const resolvers = require('./resolvers/index')
 const typeDefs = require('./typeDefs/index')
 const { connection } = require('./database/util/index')
+const { verifyUser } = require('./helper/context/index')
 
 // set environment variables
 dotEnv.config()
@@ -24,6 +25,13 @@ async function startApolloServer(typeDefs, resolvers) {
     const apolloServer = new ApolloServer({
         typeDefs,
         resolvers,
+        context: async ({ req }) => {
+            await verifyUser(req)
+
+            return {
+                email: req.email,
+            }
+        },
     })
 
     await apolloServer.start()
