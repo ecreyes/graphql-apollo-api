@@ -4,6 +4,8 @@ const { ApolloServer, gql } = require('apollo-server-express');
 const cors = require('cors');
 const dotEnv = require('dotenv');
 
+const {tasks,users} = require('./constants/index');
+
 // set environment variables
 dotEnv.config();
 
@@ -16,11 +18,37 @@ app.use(express.json());
 // apollo server
 const typeDefs = gql`
     type Query {
-        greetings: String
+        greetings: [String],
+        tasks: [Task!]
+    }
+
+    type User {
+        id: ID!,
+        name: String!,
+        email: String!,
+        tasks: [Task!]
+    }
+
+    type Task {
+        id: ID!,
+        name: String!,
+        completed: Boolean!,
+        user: User!
     }
 `;
 
-const resolvers = {};
+const resolvers = {
+    Query: {
+        greetings: ()=> ['hello world!'],
+        tasks: () => tasks
+    },
+    Task: {
+        user: (parent) => {
+            const userId = parent.userId;
+            return users.find(user => user.id === userId);
+        }
+    }
+};
 
 // server
 async function startApolloServer(typeDefs, resolvers) {
