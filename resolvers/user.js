@@ -1,6 +1,7 @@
 const { users, tasks } = require('../constants/index')
 const User = require('../database/models/user')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 module.exports = {
     Query: {
@@ -26,6 +27,28 @@ module.exports = {
                 throw error
             }
 
+        },
+        login: async (_, { input }) => {
+            try{
+                const { email, password } = input
+
+                const user = await User.findOne({ email })
+
+                if(!user) throw new Error('user not found')
+
+                const isValidPassword = await bcrypt.compare(password,user.password)
+
+                if(!isValidPassword) throw new Error('incorrect password')
+
+                const secret = process.env.JWT_SECRET_KEY || 'secret'
+                const token = jwt.sign({ email }, secret, { expiresIn: '1h' })
+
+                return { token }
+            }catch(error) {
+                console.log(error)
+
+                throw error
+            }
         },
     },
     User: {
