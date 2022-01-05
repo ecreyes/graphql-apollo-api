@@ -1,5 +1,8 @@
 const { users, tasks } = require('../constants/index')
-const uuid = require('uuid')
+const { combineResolvers } = require('graphql-resolvers')
+const { isAuthenticated } = require('./middleware/index')
+const User = require('../database/models/user')
+const Task = require('../database/models/task')
 
 module.exports = {
     Query: {
@@ -8,14 +11,24 @@ module.exports = {
         task: (_,{ id }) => tasks.find(task => task.id === id),
     },
     Mutation: {
-        createTask: (_,{ input }) => {
-            const { name, completed, userId } = input
-            const task = { id: uuid.v4() , name, completed, userId }
+        createTask: combineResolvers(isAuthenticated, async (_,{ input }, { email }) => {
+            try {
+                const { name, completed } = input
+                const user = await User.findOne({ email })
+                const task = new Task({ name,completed,user: user.id })
 
-            tasks.push(task)
+                const result = await task.save()
 
-            return task
-        },
+                user.tasks.push(result.id)
+                await user.save()
+
+                return result
+            }catch(error) {
+                console.log(error)
+
+                throw error
+            }
+        }),
     },
     Task: {
         user: parent => {
