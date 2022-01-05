@@ -2,11 +2,13 @@ const { users, tasks } = require('../constants/index')
 const User = require('../database/models/user')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const { combineResolvers } = require('graphql-resolvers')
+const { isAuthenticated } = require('./middleware/index')
 
 module.exports = {
     Query: {
         users: () => users,
-        user: (_, { id }) => users.find(user => user.id === id),
+        user: combineResolvers(isAuthenticated, (_, { id }) => users.find(user => user.id === id)),
     },
     Mutation: {
         signup: async (_, { input }) => {
