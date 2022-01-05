@@ -19,7 +19,8 @@ app.use(express.json());
 const typeDefs = gql`
     type Query {
         greetings: [String],
-        tasks: [Task!]
+        tasks: [Task!],
+        task(id: ID!): Task
     }
 
     type User {
@@ -40,7 +41,9 @@ const typeDefs = gql`
 const resolvers = {
     Query: {
         greetings: ()=> ['hello world!'],
-        tasks: () => tasks
+        tasks: () => tasks,
+        // (parent,args)
+        task: (_,{id}) => tasks.find(task => task.id === id)
     },
     Task: {
         user: (parent) => {
