@@ -1,9 +1,10 @@
 const express = require('express')
 const app = express()
-const { ApolloServer, gql } = require('apollo-server-express')
+const { ApolloServer } = require('apollo-server-express')
 const cors = require('cors')
 const dotEnv = require('dotenv')
 const resolvers = require('./resolvers/index')
+const typeDefs = require('./typeDefs/index')
 
 // set environment variables
 dotEnv.config()
@@ -13,40 +14,6 @@ app.use(cors())
 
 // body parser middleware
 app.use(express.json())
-
-// apollo server
-const typeDefs = gql`
-    type Query {
-        tasks: [Task!],
-        task(id: ID!): Task,
-        users: [User!],
-        user(id: ID!): User
-    }
-
-    input createTaskInput {
-        name: String!,
-        completed: Boolean!,
-        userId: ID!
-    }
-
-    type Mutation {
-        createTask(input: createTaskInput): Task
-    }
-
-    type User {
-        id: ID!,
-        name: String!,
-        email: String!,
-        tasks: [Task!]
-    }
-
-    type Task {
-        id: ID!,
-        name: String!,
-        completed: Boolean!,
-        user: User!
-    }
-`
 
 // server
 async function startApolloServer(typeDefs, resolvers) {
