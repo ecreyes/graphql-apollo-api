@@ -54,7 +54,7 @@ module.exports = {
                 if(!isValidPassword) throw new Error('incorrect password')
 
                 const secret = process.env.JWT_SECRET_KEY || 'secret'
-                const token = jwt.sign({ email }, secret, { expiresIn: '1h' })
+                const token = jwt.sign({ email }, secret, { expiresIn: '6h' })
 
                 return { token }
             }catch(error) {

@@ -2,9 +2,10 @@ const { gql } = require('apollo-server-express')
 
 module.exports = gql`
     extend type Query {
-        tasks(skip: Int, limit: Int): [Task!],
+        tasks(cursor: String, limit: Int): TaskFeed!,
         task(id: ID!): Task,
     }
+
 
     input createTaskInput {
         name: String!,
@@ -27,5 +28,15 @@ module.exports = gql`
         name: String!,
         completed: Boolean!,
         user: User!
+    }
+
+    type TaskFeed {
+        taskFeed: [Task!],
+        pageInfo: PageInfo
+    }
+
+    type PageInfo {
+        nextPageCursor: String,
+        hasNextPage: Boolean
     }
 `
