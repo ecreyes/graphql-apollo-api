@@ -7,6 +7,8 @@ const resolvers = require('./resolvers/index')
 const typeDefs = require('./typeDefs/index')
 const { connection } = require('./database/util/index')
 const { verifyUser } = require('./helper/context/index')
+const Dataloader = require('dataloader')
+const loaders = require('./loaders/index')
 
 // set environment variables
 dotEnv.config()
@@ -31,6 +33,9 @@ async function startApolloServer(typeDefs, resolvers) {
             return {
                 email: req.email,
                 loggedInUserId: req.loggedInUserId,
+                loaders: {
+                    user: new Dataloader(keys => loaders.user.batchUsers(keys)),
+                },
             }
         },
     })
