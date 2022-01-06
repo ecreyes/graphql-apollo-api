@@ -5,9 +5,9 @@ const Task = require('../database/models/task')
 
 module.exports = {
     Query: {
-        tasks: combineResolvers(isAuthenticated ,async (_,__, { loggedInUserId }) => {
+        tasks: combineResolvers(isAuthenticated ,async (_, { skip, limit },{ loggedInUserId }) => {
             try{
-                const tasks = await Task.find({ user: loggedInUserId })
+                const tasks = await Task.find({ user: loggedInUserId }).sort({ id: -1 }).skip(skip).limit(limit)
 
                 return tasks
             }catch(error) {
