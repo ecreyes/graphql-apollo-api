@@ -11,8 +11,14 @@ module.exports = gql`
         completed: Boolean!
     }
 
+    input updateTaskInput {
+        name: String
+        completed: Boolean
+    }
+
     extend type Mutation {
-        createTask(input: createTaskInput): Task
+        createTask(input: createTaskInput): Task,
+        updateTask(id:ID!, input: updateTaskInput): Task
     }
 
     type Task {
